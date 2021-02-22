@@ -14,7 +14,10 @@ body {
 
 .board {
     --tile-size:50px;
+    --door: brown;
     --wall-border: 4px solid var(--light);
+    --door-border: 6px solid var(--door);
+    --open-door-border: 6px dotted var(--door);
 
     display:grid;
     grid-template-columns: repeat(var(--grid-columns), var(--tile-size));
@@ -39,4 +42,30 @@ body {
 }
 .west-wall {
     border-left: var(--wall-border);
+}
+
+.north-door {
+    border-top: var(--door-border);
+}
+.east-door {
+    border-right: var(--door-border);
+}
+.south-door {
+    border-bottom: var(--door-border);
+}
+.west-door {
+    border-left: var(--door-border);
+}
+
+.north-open-door {
+    border-top: var(--open-door-border);
+}
+.east-open-door {
+    border-right: var(--open-door-border);
+}
+.south-open-door {
+    border-bottom: var(--open-door-border);
+}
+.west-open-door {
+    border-left: var(--open-door-border);
 }

@@ -11,9 +11,9 @@ class TileFixtures extends Fixture
     public const TILES = [
         'green' => [
             ['coords' => '1,1', 'borders' => ['wall', null, null, 'wall']],
-            ['coords' => '1,2', 'borders' => ['wall', null, null, null]],
+            ['coords' => '1,2', 'borders' => ['door', null, null, null]],
             ['coords' => '1,3', 'borders' => ['wall', 'wall', null, null]],
-            ['coords' => '2,1', 'borders' => [null, null, 'wall', 'wall']],
+            ['coords' => '2,1', 'borders' => [null, null, 'open-door', 'wall']],
             ['coords' => '2,2', 'borders' => [null, null, 'wall', null]],
             ['coords' => '2,3', 'borders' => [null, 'wall', 'wall', null]],
         ],
