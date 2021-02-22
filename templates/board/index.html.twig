@@ -6,10 +6,20 @@
 {% block body %}
 
 	<div class="board" style="--grid-colums:{{ constant('App\\Controller\\BoardController::BOARD_COLUMNS') }};
-		--grid-rows:{{ constant('App\\Controller\\BoardController::BOARD_ROWS') }};">
+											--grid-rows:{{ constant('App\\Controller\\BoardController::BOARD_ROWS') }};">
 
 		{% for tile in boardTiles %}
-			<div class="tile" style="--tile-background:{{tile.room.color ?? 'grey'}}"></div>
+			{% if tile is not null %}
+				<div class="tile
+                    {{ tile.north ? 'north-wall'}}
+                    {{ tile.east ? 'east-wall'}}
+                    {{ tile.south ? 'south-wall'}}
+                    {{ tile.west ? 'west-wall'}}
+                    " style="--tile-background:{{tile.room.color ?? 'grey'}}
+                    "></div>
+			{% else %}
+				<div class="tile"></div>
+			{% endif %}
 		{% endfor %}
 	</div>
 {% endblock %}

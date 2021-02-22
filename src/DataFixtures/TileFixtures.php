@@ -9,18 +9,38 @@ use Doctrine\Persistence\ObjectManager;
 class TileFixtures extends Fixture
 {
     public const TILES = [
-        'green' => ['1,1', '1,2', '1,3', '2,1', '2,2', '2,3'],
-        'red' => ['4,1', '4,2', '4,3', '5,1', '5,2', '5,3'],
+        'green' => [
+            ['coords' => '1,1', 'borders' => ['wall', null, null, 'wall']],
+            ['coords' => '1,2', 'borders' => ['wall', null, null, null]],
+            ['coords' => '1,3', 'borders' => ['wall', 'wall', null, null]],
+            ['coords' => '2,1', 'borders' => [null, null, 'wall', 'wall']],
+            ['coords' => '2,2', 'borders' => [null, null, 'wall', null]],
+            ['coords' => '2,3', 'borders' => [null, 'wall', 'wall', null]],
+        ],
+        'red' => [
+            ['coords' => '4,1', 'borders' => ['wall', null, null, 'wall']],
+            ['coords' => '4,2', 'borders' => ['wall', null, null, null]],
+            ['coords' => '4,3', 'borders' => ['wall', 'wall', null, null]],
+            ['coords' => '5,1', 'borders' => [null, null, 'wall', 'wall']],
+            ['coords' => '5,2', 'borders' => [null, null, 'wall', null]],
+            ['coords' => '5,3', 'borders' => [null, 'wall', 'wall', null]],
+        ],
     ];
 
     public function load(ObjectManager $manager)
     {
-        foreach (self::TILES as $room => $tileData) {
-            foreach ($tileData as $tileCoords) {
-                [$x, $y] = explode(',', $tileCoords);
+        foreach (self::TILES as $room => $tiles) {
+            foreach ($tiles as $tileData) {
+                [$x, $y] = explode(',', $tileData['coords']);
+                [$north, $east, $south, $west] = $tileData['borders'];
+
                 $tile = new Tile();
                 $tile->setX($x);
                 $tile->setY($y);
+                $tile->setNorth($north);
+                $tile->setEast($east);
+                $tile->setSouth($south);
+                $tile->setWest($west);
                 $tile->setRoom($this->getReference($room));
 
                 $manager->persist($tile);

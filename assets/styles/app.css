@@ -1,21 +1,42 @@
+:root {
+    --primary: rgb(129, 129, 129);
+    --light: white;
+    --dark: black;
+
+}
+* {
+    box-sizing: border-box;
+}
 body {
-    background-color: lightgray;
+    margin:0;
+    background-color: var(--light);
 }
 
 .board {
     --tile-size:50px;
+    --wall-border: 4px solid var(--light);
 
     display:grid;
     grid-template-columns: repeat(var(--grid-columns), var(--tile-size));
     grid-template-columns: repeat(var(--grid-rows), var(--tile-size));
-
-    width: auto;
-    height: 100vh;
-    gap:2px;
 }
 
 .tile {
-    background-color: var(--tile-background, 'grey');
+    background-color: var(--tile-background, var(--primary));
     width: var(--tile-size);
     height: var(--tile-size);
+    border: 1px solid var(--dark);
+}
+
+.north-wall {
+    border-top: var(--wall-border);
+}
+.east-wall {
+    border-right: var(--wall-border);
+}
+.south-wall {
+    border-bottom: var(--wall-border);
+}
+.west-wall {
+    border-left: var(--wall-border);
 }
