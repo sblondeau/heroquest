@@ -1,0 +1,21 @@
+body {
+    background-color: lightgray;
+}
+
+.board {
+    --tile-size:50px;
+
+    display:grid;
+    grid-template-columns: repeat(var(--grid-columns), var(--tile-size));
+    grid-template-columns: repeat(var(--grid-rows), var(--tile-size));
+
+    width: auto;
+    height: 100vh;
+    gap:2px;
+}
+
+.tile {
+    background-color: var(--tile-background, 'grey');
+    width: var(--tile-size);
+    height: var(--tile-size);
+}

@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello BoardController!
+{% endblock %}
+
+{% block body %}
+
+	<div class="board" style="--grid-colums:{{ constant('App\\Controller\\BoardController::BOARD_COLUMNS') }};
+		--grid-rows:{{ constant('App\\Controller\\BoardController::BOARD_ROWS') }};">
+
+		{% for tile in boardTiles %}
+			<div class="tile" style="--tile-background:{{tile.room.color ?? 'grey'}}"></div>
+		{% endfor %}
+	</div>
+{% endblock %}
