@@ -3,15 +3,16 @@
 namespace App\Controller;
 
 use App\Repository\TileRepository;
+use App\Repository\HeroRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use index;
 
 class BoardController extends AbstractController
 {
     public const BOARD_COLUMNS = 20;
     public const BOARD_ROWS = 30;
+    public const DIRECTIONS = ['N' => [0, -1], 'E' => [1, 0], 'S' => [0, 1], 'W' => [-1, 0]];
 
     /**
      * @Route("/", name="board")
@@ -34,5 +35,19 @@ class BoardController extends AbstractController
             'cols' => self::BOARD_COLUMNS,
             'rows' => self::BOARD_ROWS,
         ]);
+    }
+
+    /**
+     * @Route("/move/{direction<N|S|E|W>}", name="move")
+     */
+    public function move(HeroRepository $heroRepository, string $direction)
+    {
+        $hero = $heroRepository->findOneBy([]);
+        [$xModifier, $yModifier] = self::DIRECTIONS[$direction];
+        $hero
+            ->setX($hero->getX() + $xModifier)
+            ->setY($hero->getX() + $yModifier);
+
+        return $this->redirectToRoute('board');
     }
 }
