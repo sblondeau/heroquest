@@ -21,6 +21,11 @@
                     {% endfor %}
                     " style="--tile-background:{{tile.room.color ?? 'grey'}}
                 ">
+                    {% for hero in heroes %}
+                        {% if hero.x == tile.x and hero.y == tile.y %}
+                            <div class="hero">H</div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
 			{% else %}
 				<div class="tile"></div>

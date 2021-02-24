@@ -9,7 +9,7 @@ use Doctrine\Persistence\ObjectManager;
 class RoomFixtures extends Fixture
 {
     public const ROOMS = [
-        'yellow', 'red', 'blue', 'green',
+        'yellow', 'red', 'blue', 'green', 'passage'
     ];
 
     public function load(ObjectManager $manager)

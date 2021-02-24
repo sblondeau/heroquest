@@ -52,6 +52,11 @@ class Tile
      */
     private $room;
 
+    /**
+     * @ORM\OneToOne(targetEntity=Hero::class, cascade={"persist", "remove"})
+     */
+    private $occupant;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -138,6 +143,21 @@ class Tile
     {
         $this->room = $room;
 
+        return $this;
+    }
+
+    public function getOccupant(): ?Hero
+    {
+        return $this->occupant;
+    }
+
+    public function setOccupant(?Hero $occupant): self
+    {
+        $this->occupant = $occupant;
+        if ($occupant instanceof Hero) {
+            $this->occupant->setX($this->getX());
+            $this->occupant->setY($this->getY());
+        }
         return $this;
     }
 }

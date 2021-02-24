@@ -29,6 +29,10 @@ body {
     width: var(--tile-size);
     height: var(--tile-size);
     border: 1px solid var(--dark);
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    padding:10%;
 }
 
 .north-wall {
@@ -68,4 +72,10 @@ body {
 }
 .west-open-door {
     border-left: var(--open-door-border);
+}
+
+.hero {
+    width: 100%;
+    height: 100%;
+    background-color: white;
 }

@@ -5,10 +5,16 @@ namespace App\DataFixtures;
 use App\Entity\Tile;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
-class TileFixtures extends Fixture
+class TileFixtures extends Fixture implements DependentFixtureInterface
 {
     public const TILES = [
+        'passage' => [
+            ['coords' => '0,0', 'borders' => ['wall', null, null, 'wall'], 'occupant' => 'dwarf'],
+            ['coords' => '1,0', 'borders' => ['wall', null, null, 'wall']],
+            ['coords' => '2,0', 'borders' => ['wall', null, null, 'wall']],
+        ],
         'green' => [
             ['coords' => '1,1', 'borders' => ['wall', null, null, 'wall']],
             ['coords' => '1,2', 'borders' => ['door', null, null, null]],
@@ -33,14 +39,19 @@ class TileFixtures extends Fixture
             foreach ($tiles as $tileData) {
                 [$x, $y] = explode(',', $tileData['coords']);
                 [$north, $east, $south, $west] = $tileData['borders'];
-
+        
                 $tile = new Tile();
+
                 $tile->setX($x);
                 $tile->setY($y);
                 $tile->setNorth($north);
                 $tile->setEast($east);
                 $tile->setSouth($south);
                 $tile->setWest($west);
+
+                if(key_exists('occupant', $tileData)) {
+                    $tile->setOccupant($this->getReference($tileData['occupant']));
+                }
                 $tile->setRoom($this->getReference($room));
 
                 $manager->persist($tile);
@@ -49,5 +60,13 @@ class TileFixtures extends Fixture
 
 
         $manager->flush();
+    }
+
+    public function getDependencies()
+    {
+        return [
+            RoomFixtures::class,
+            HeroFixtures::class,
+        ];
     }
 }
