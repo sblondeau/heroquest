@@ -14,6 +14,7 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
             ['coords' => '0,0', 'borders' => ['wall', null, null, 'wall'], 'occupant' => 'dwarf'],
             ['coords' => '1,0', 'borders' => ['wall', null, null, 'wall']],
             ['coords' => '2,0', 'borders' => ['wall', null, null, 'wall']],
+            ['coords' => '3,3', 'borders' => [null, 'wall', 'wall', 'null']],
         ],
         'green' => [
             ['coords' => '1,1', 'borders' => ['wall', null, null, 'wall']],

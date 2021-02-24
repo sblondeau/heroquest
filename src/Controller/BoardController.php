@@ -13,8 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class BoardController extends AbstractController
 {
-    public const BOARD_COLUMNS = 20;
-    public const BOARD_ROWS = 30;
+    public const BOARD_COLUMNS = 10;
+    public const BOARD_ROWS = 20;
     public const DIRECTIONS = ['N' => [0, -1], 'E' => [1, 0], 'S' => [0, 1], 'W' => [-1, 0]];
 
     /**
@@ -24,20 +24,17 @@ class BoardController extends AbstractController
     {
         $tiles = $tileRepository->findAll();
         foreach ($tiles as $tile) {
-            $tileCoords[$tile->getX()][$tile->getY()] = $tile;
+            $tileCoords[$tile->getY()][$tile->getX()] = $tile;
         }
 
-        for ($x = 0; $x < self::BOARD_COLUMNS; $x++) {
-            for ($y = 0; $y < self::BOARD_ROWS; $y++) {
-                $boardTiles[] = $tileCoords[$x][$y] ?? null;
+        for ($y = 0; $y < self::BOARD_ROWS; $y++) {
+            for ($x = 0; $x < self::BOARD_COLUMNS; $x++) {
+                $boardTiles[] = $tileCoords[$y][$x] ?? null;
             }
         }
 
         return $this->render('board/index.html.twig', [
             'boardTiles' => $boardTiles,
-            'heroes' => $heroRepository->findAll(),
-            'cols' => self::BOARD_COLUMNS,
-            'rows' => self::BOARD_ROWS,
         ]);
     }
 

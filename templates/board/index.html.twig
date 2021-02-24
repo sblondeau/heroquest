@@ -9,7 +9,7 @@
     <a href="{{path('move', {'direction': 'S'})}}">South</a>
     <a href="{{path('move', {'direction': 'W'})}}">West</a>
 
-	<div class="board" style="--grid-colums:{{ constant('App\\Controller\\BoardController::BOARD_COLUMNS') }};
+	<div class="board" style="--grid-columns:{{ constant('App\\Controller\\BoardController::BOARD_COLUMNS') }};
 											--grid-rows:{{ constant('App\\Controller\\BoardController::BOARD_ROWS') }};">
 
         {% set directions = ['north', 'south', 'east', 'west'] %}
@@ -21,11 +21,9 @@
                     {% endfor %}
                     " style="--tile-background:{{tile.room.color ?? 'grey'}}
                 ">
-                    {% for hero in heroes %}
-                        {% if hero.x == tile.x and hero.y == tile.y %}
+                        {% if tile.occupant is not null %}
                             <div class="hero">H</div>
                         {% endif %}
-                    {% endfor %}
                 </div>
 			{% else %}
 				<div class="tile"></div>
