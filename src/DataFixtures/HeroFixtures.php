@@ -10,12 +10,15 @@ class HeroFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        $hero = new Hero;
-        $hero->setName('Dwarf');
-        $hero->setX(1);
-        $hero->setY(1);
-        $this->addReference('dwarf', $hero);
-        $manager->persist($hero);
+        $dwarf = new Hero;
+        $dwarf->setName('Dwarf');
+        $this->addReference('dwarf', $dwarf);
+        $manager->persist($dwarf); 
+        
+        $barbarian = new Hero;
+        $barbarian->setName('Barbarian');
+        $this->addReference('barbarian', $barbarian);
+        $manager->persist($barbarian);
 
         $manager->flush();
     }

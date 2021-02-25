@@ -22,7 +22,7 @@
                     " style="--tile-background:{{tile.room.color ?? 'grey'}}
                 ">
                         {% if tile.occupant is not null %}
-                            <div class="hero">H</div>
+                            <div class="hero">{{ tile.occupant.name }}</div>
                         {% endif %}
                 </div>
 			{% else %}

@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Controller\BoardController;
 use App\Entity\Tile;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -13,7 +14,9 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
     const DOOR = 'door';
     const OPEN_DOOR = 'open-door';
 
-    private function makeRoom(int $startX, int $endX, int $startY, int $endY): array
+    private array $board = [];
+
+    private function makeRoom(string $roomColor, int $startX, int $endX, int $startY, int $endY): void
     {
         for ($x = $startX; $x < $endX; $x++) {
             for ($y = $startY; $y < $endY; $y++) {
@@ -31,61 +34,54 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
                     $wallSouth = self::WALL;
                 }
 
-                $room[$x][$y] = ['borders' => [$wallNorth, $wallEast, $wallSouth, $wallWest]];
+                $this->board[$x][$y] = ['room' => $roomColor, 'borders' => [$wallNorth, $wallEast, $wallSouth, $wallWest]];
             }
         }
-
-        return $room;
     }
 
 
 
     public function load(ObjectManager $manager)
     {
-        $rooms['red'] = $this->makeRoom(1, 4, 1, 6);
-        $rooms['green'] = $this->makeRoom(5, 9, 1, 5);
-        $rooms['red'][3][2]['borders'][1] = self::OPEN_DOOR;
-        $rooms['green'][5][3]['borders'][3] = self::OPEN_DOOR;
+        $this->makeRoom('red', 1, 4, 1, 6);
+        $this->makeRoom('green', 5, 9, 1, 5);
 
-        $rooms['passage'][0][0] = [];
-        $rooms['passage'][0][1] = [];
-        $rooms['passage'][1][0] = [];
-        $rooms['passage'][2][0] = [];
-        $rooms['passage'][3][0] = [];
-        $rooms['passage'][4][0] = [];
-        $rooms['passage'][4][1] = [];
-        $rooms['passage'][4][2] = [];
-        $rooms['passage'][4][3] = [];
-
-        $rooms['red'][2][3]['occupant'] = 'dwarf';
-
-        foreach ($rooms as $room => $tileXData) {
-            foreach ($tileXData as $x => $tileYData) {
-                foreach ($tileYData as $y => $tileData) {
-                    $tile = new Tile();
-
-                    $tile->setX($x);
-                    $tile->setY($y);
-
-                    if (key_exists('borders', $tileData)) {
-                        [$north, $east, $south, $west] = $tileData['borders'];
-                        $tile->setNorth($north);
-                        $tile->setEast($east);
-                        $tile->setSouth($south);
-                        $tile->setWest($west);
-                    }
-
-                    if (key_exists('occupant', $tileData)) {
-                        $tile->setOccupant($this->getReference($tileData['occupant']));
-                    }
-
-                    $tile->setRoom($this->getReference($room));
-
-                    $manager->persist($tile);
-                }
+        for ($y = 0; $y < BoardController::BOARD_ROWS; $y++) {
+            for ($x = 0; $x < BoardController::BOARD_COLUMNS; $x++) {
+                $this->board[$x][$y] ??= [];
             }
         }
+        
+        $this->board[3][2]['borders'][1] = self::OPEN_DOOR;
+        $this->board[5][3]['borders'][3] = self::OPEN_DOOR;
+        $this->board[2][3]['occupant'] = 'dwarf';
+        $this->board[2][4]['occupant'] = 'barbarian';
 
+        foreach ($this->board as $x => $tileYData) {
+            foreach ($tileYData as $y => $tileData) {
+                $tile = new Tile();
+
+                $tile->setX($x);
+                $tile->setY($y);
+
+                if (key_exists('borders', $tileData)) {
+
+                    [$north, $east, $south, $west] = $tileData['borders'];
+                    $tile->setNorth($north);
+                    $tile->setEast($east);
+                    $tile->setSouth($south);
+                    $tile->setWest($west);
+                }
+
+                if (key_exists('occupant', $tileData)) {
+                    $tile->setOccupant($this->getReference($tileData['occupant']));
+                }
+
+                $tile->setRoom($this->getReference($tileData['room'] ?? 'passage'));
+
+                $manager->persist($tile);
+            }
+        }
 
         $manager->flush();
     }
