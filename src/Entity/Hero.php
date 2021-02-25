@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=HeroRepository::class)
  */
-class Hero
+class Hero extends Character
 {
     /**
      * @ORM\Id
@@ -33,6 +33,11 @@ class Hero
      * @ORM\Column(type="integer")
      */
     private $y;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Tile::class, mappedBy="occupant", cascade={"persist", "remove"})
+     */
+    private $tile;
 
 
     public function getId(): ?int
@@ -75,4 +80,27 @@ class Hero
 
         return $this;
     }
+
+    public function getTile(): ?Tile
+    {
+        return $this->tile;
+    }
+
+    public function setTile(?Tile $tile): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($tile === null && $this->tile !== null) {
+            $this->tile->setOccupant(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($tile !== null && $tile->getOccupant() !== $this) {
+            $tile->setOccupant($this);
+        }
+
+        $this->tile = $tile;
+
+        return $this;
+    }
+
 }

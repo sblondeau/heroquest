@@ -4,10 +4,10 @@
 {% endblock %}
 
 {% block body %}
-    <a href="{{path('move', {'direction': 'N'})}}">North</a>
-    <a href="{{path('move', {'direction': 'E'})}}">East</a>
-    <a href="{{path('move', {'direction': 'S'})}}">South</a>
-    <a href="{{path('move', {'direction': 'W'})}}">West</a>
+    <a href="{{path('move', {'direction': 'North'})}}">North</a>
+    <a href="{{path('move', {'direction': 'East'})}}">East</a>
+    <a href="{{path('move', {'direction': 'South'})}}">South</a>
+    <a href="{{path('move', {'direction': 'West'})}}">West</a>
 
 	<div class="board" style="--grid-columns:{{ constant('App\\Controller\\BoardController::BOARD_COLUMNS') }};
 											--grid-rows:{{ constant('App\\Controller\\BoardController::BOARD_ROWS') }};">

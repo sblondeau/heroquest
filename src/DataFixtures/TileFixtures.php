@@ -9,53 +9,70 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 class TileFixtures extends Fixture implements DependentFixtureInterface
 {
-    public const TILES = [
-        'passage' => [
-            ['coords' => '0,0', 'borders' => ['wall', null, null, 'wall'], 'occupant' => 'dwarf'],
-            ['coords' => '1,0', 'borders' => ['wall', null, null, 'wall']],
-            ['coords' => '2,0', 'borders' => ['wall', null, null, 'wall']],
-            ['coords' => '3,3', 'borders' => [null, 'wall', 'wall', 'null']],
-        ],
-        'green' => [
-            ['coords' => '1,1', 'borders' => ['wall', null, null, 'wall']],
-            ['coords' => '1,2', 'borders' => ['door', null, null, null]],
-            ['coords' => '1,3', 'borders' => ['wall', 'wall', null, null]],
-            ['coords' => '2,1', 'borders' => [null, null, 'open-door', 'wall']],
-            ['coords' => '2,2', 'borders' => [null, null, 'wall', null]],
-            ['coords' => '2,3', 'borders' => [null, 'wall', 'wall', null]],
-        ],
-        'red' => [
-            ['coords' => '4,1', 'borders' => ['wall', null, null, 'wall']],
-            ['coords' => '4,2', 'borders' => ['wall', null, null, null]],
-            ['coords' => '4,3', 'borders' => ['wall', 'wall', null, null]],
-            ['coords' => '5,1', 'borders' => [null, null, 'wall', 'wall']],
-            ['coords' => '5,2', 'borders' => [null, null, 'wall', null]],
-            ['coords' => '5,3', 'borders' => [null, 'wall', 'wall', null]],
-        ],
-    ];
+    const WALL = 'wall';
+    const DOOR = 'door';
+    const OPEN_DOOR = 'open-door';
+
+    private function makeRoom(int $startX, int $endX, int $startY, int $endY): array
+    {
+        for ($x = $startX; $x < $endX; $x++) {
+            for ($y = $startY; $y < $endY; $y++) {
+                $wallNorth = $wallEast = $wallSouth = $wallWest = null;
+                if ($x == $startX) {
+                    $wallWest = self::WALL;
+                }
+                if ($x == $endX - 1) {
+                    $wallEast = self::WALL;
+                }
+                if ($y == $startY) {
+                    $wallNorth = self::WALL;
+                }
+                if ($y == $endY - 1) {
+                    $wallSouth = self::WALL;
+                }
+
+                $room[$x][$y] = ['borders' => [$wallNorth, $wallEast, $wallSouth, $wallWest]];
+            }
+        }
+
+        return $room;
+    }
+
+
 
     public function load(ObjectManager $manager)
     {
-        foreach (self::TILES as $room => $tiles) {
-            foreach ($tiles as $tileData) {
-                [$x, $y] = explode(',', $tileData['coords']);
-                [$north, $east, $south, $west] = $tileData['borders'];
-        
-                $tile = new Tile();
+        $rooms['red'] = $this->makeRoom(1, 4, 1, 6);
+        $rooms['green'] = $this->makeRoom(6, 9, 1, 5);
 
-                $tile->setX($x);
-                $tile->setY($y);
-                $tile->setNorth($north);
-                $tile->setEast($east);
-                $tile->setSouth($south);
-                $tile->setWest($west);
+        $rooms['passage'][0][0] = [];
+        $rooms['passage'][0][1] = [];
+        $rooms['passage'][1][0] = [];
 
-                if(key_exists('occupant', $tileData)) {
-                    $tile->setOccupant($this->getReference($tileData['occupant']));
+        foreach ($rooms as $room => $tileXData) {
+            foreach ($tileXData as $x => $tileYData) {
+                foreach ($tileYData as $y => $tileData) {
+                    $tile = new Tile();
+
+                    $tile->setX($x);
+                    $tile->setY($y);
+
+                    if (key_exists('borders', $tileData)) {
+                        [$north, $east, $south, $west] = $tileData['borders'];
+                        $tile->setNorth($north);
+                        $tile->setEast($east);
+                        $tile->setSouth($south);
+                        $tile->setWest($west);
+                    }
+
+                    if (key_exists('occupant', $tileData)) {
+                        $tile->setOccupant($this->getReference($tileData['occupant']));
+                    }
+
+                    $tile->setRoom($this->getReference($room));
+
+                    $manager->persist($tile);
                 }
-                $tile->setRoom($this->getReference($room));
-
-                $manager->persist($tile);
             }
         }
 
