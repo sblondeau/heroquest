@@ -43,11 +43,21 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager)
     {
         $rooms['red'] = $this->makeRoom(1, 4, 1, 6);
-        $rooms['green'] = $this->makeRoom(6, 9, 1, 5);
+        $rooms['green'] = $this->makeRoom(5, 9, 1, 5);
+        $rooms['red'][3][2]['borders'][1] = self::OPEN_DOOR;
+        $rooms['green'][5][3]['borders'][3] = self::OPEN_DOOR;
 
         $rooms['passage'][0][0] = [];
         $rooms['passage'][0][1] = [];
         $rooms['passage'][1][0] = [];
+        $rooms['passage'][2][0] = [];
+        $rooms['passage'][3][0] = [];
+        $rooms['passage'][4][0] = [];
+        $rooms['passage'][4][1] = [];
+        $rooms['passage'][4][2] = [];
+        $rooms['passage'][4][3] = [];
+
+        $rooms['red'][2][3]['occupant'] = 'dwarf';
 
         foreach ($rooms as $room => $tileXData) {
             foreach ($tileXData as $x => $tileYData) {
