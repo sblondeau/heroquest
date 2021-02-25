@@ -46,7 +46,7 @@ class BoardController extends AbstractController
     {
         $occupant = $heroRepository->findOneBy([]);
         try {
-        $moveService->move($occupant, $direction);
+            $moveService->move($occupant, $direction);
         } catch (Exception $exception) {
             $this->addFlash('danger', $exception->getMessage());
         }

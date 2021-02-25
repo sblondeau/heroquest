@@ -69,5 +69,4 @@ class Hero extends Character
 
         return $this;
     }
-
 }

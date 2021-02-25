@@ -30,10 +30,13 @@ class MoveService
         [$xModifier, $yModifier] = self::DIRECTIONS[$direction];
         $tile = $character->getTile();
 
-        $destinationTile = $this->tileRepository->findOneBy(['x' => $tile->getX() + $xModifier, 'y' => $tile->getY() + $yModifier]);
+        $destinationTile = $this->tileRepository->findOneBy([
+            'x' => $tile->getX() + $xModifier,
+            'y' => $tile->getY() + $yModifier
+        ]);
         if (!$destinationTile instanceof Tile) {
             throw new OutOfRangeException('Impossible move');
-        }       
+        }
         
         if ($this->isFree($tile, $destinationTile, $direction) === true) {
             throw new RuntimeException('The way is not free');
@@ -49,10 +52,9 @@ class MoveService
     {
         $getDirection = 'get'. $direction;
         $getInversedDirection = 'get'. self::INVERSED_DIRECTIONS[$direction];
-        return 
+        return
             $destinationTile->getOccupant() !== null ||
             in_array($tile->$getDirection(), ['wall', 'door']) ||
-            in_array($destinationTile->$getInversedDirection(), ['wall', 'door']); 
+            in_array($destinationTile->$getInversedDirection(), ['wall', 'door']);
     }
-
 }

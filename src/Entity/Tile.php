@@ -158,6 +158,4 @@ class Tile
 
         return $this;
     }
-
-
 }

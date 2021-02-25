@@ -34,12 +34,13 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
                     $wallSouth = self::WALL;
                 }
 
-                $this->board[$x][$y] = ['room' => $roomColor, 'borders' => [$wallNorth, $wallEast, $wallSouth, $wallWest]];
+                $this->board[$x][$y] = [
+                    'room' => $roomColor,
+                    'borders' => [$wallNorth, $wallEast, $wallSouth, $wallWest],
+                ];
             }
         }
     }
-
-
 
     public function load(ObjectManager $manager)
     {
@@ -65,7 +66,6 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
                 $tile->setY($y);
 
                 if (key_exists('borders', $tileData)) {
-
                     [$north, $east, $south, $west] = $tileData['borders'];
                     $tile->setNorth($north);
                     $tile->setEast($east);
