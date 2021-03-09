@@ -82,3 +82,11 @@ body {
     background-color: var(--light);
     border-radius: 50%;
 }
+
+.furniture {
+    transform-origin: calc(var(--tile-size) /2) calc(var(--tile-size) /2);
+    rotate: var(--furniture-rotate);
+    grid-column: var(--furniture-column);
+    grid-row: var(--furniture-row);
+    background-color: aqua;
+}

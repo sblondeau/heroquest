@@ -15,12 +15,6 @@ class FurnitureOrganizer
 
     private TileRepository $tileRepository;
 
-    public const DIRECTIONS = [
-        'North' => [1, -1],
-        'East' => [1, 1],
-        'South' => [-1, 1],
-        'West' => [-1, -1],
-    ];
 
     public function __construct(EntityManagerInterface $entityManager, TileRepository $tileRepository)
     {
@@ -28,35 +22,90 @@ class FurnitureOrganizer
         $this->tileRepository = $tileRepository;
     }
 
+    private function setStandardOrientation(Furniture $furniture): array
+    {
+        for ($x = 0; $x < $furniture->getWidth(); $x++) {
+            for ($y = 0; $y < $furniture->getHeight(); $y++) {
+                $coordinates[] = [$x, $y];
+            }
+        }
+
+        return $coordinates ?? [];
+    }
+
+    private function rotate(array $coordinates, float $angle): array
+    {
+        foreach ($coordinates as $coordinate) {
+            [$x, $y] = $coordinate;
+            $newX = $x * cos($angle) - $y * sin($angle);
+            $newY = -$x * sin($angle) + $y * cos($angle);
+            $newCoordinates[] = [$newX, $newY];
+        }
+
+        return $newCoordinates ?? [];
+    }
+
+    public function getRotationPoint(Furniture $furniture): array
+    {
+        foreach ($furniture->getTiles() as $tile) {
+            $xCoordinates[] = $tile->getX();
+            $yCoordinates[] = $tile->getY();
+        }
+
+        switch ($furniture->getDirection()) {
+            case 'North':
+                $coordinates = [min($xCoordinates), max($yCoordinates)];
+                break;
+            case 'West':
+                $coordinates = [min($xCoordinates), min($yCoordinates)];
+                break;
+            case 'South':
+                $coordinates = [max($xCoordinates), min($yCoordinates)];
+                break;
+            case 'East':
+                $coordinates = [max($xCoordinates), max($yCoordinates)];
+                break;
+        }
+
+        return $coordinates ?? [];
+    }
+
+
+    private function getTilesFromCoordinates(array $coordinates, int $startX, int $startY): array
+    {
+        foreach ($coordinates as $coordinate) {
+            [$x, $y] = $coordinate;
+            $tile = $this->tileRepository->findOneBy(['x' => $x + $startX, 'y' => $y + $startY]);
+            if (!$tile instanceof Tile) {
+                throw new Exception('Impossible to place furniture here');
+            }
+
+            $tiles[] = $tile;
+        }
+
+        return $tiles ?? [];
+    }
+
     public function organize(int $startX, int $startY, Furniture $furniture)
     {
-        $xIncrement =  self::DIRECTIONS[$furniture->getDirection()][0];
-        $yIncrement =  self::DIRECTIONS[$furniture->getDirection()][1];
-
-        $xSize = $furniture->getWidth();
-        $ySize = $furniture->getHeight();
-
-        if (in_array($furniture->getDirection(), ['North', 'South'])) {
-            $xSize = $furniture->getHeight();
-            $ySize = $furniture->getWidth();
-        }
-        for ($x = 0; $x < $xSize; $x++) {
-            for ($y = 0; $y < $ySize; $y++) {
-                $tile = $this->tileRepository->findOneBy(['x' => $startX + $x * $xIncrement, 'y' => $startY + $y * $yIncrement]);
-                if (!$tile instanceof Tile) {
-                    throw new Exception('Impossible to place furniture here');
-                }
-                $tiles[] = $tile;
-            }
+        if (!key_exists($furniture->getDirection(), MoveService::DIRECTIONS)) {
+            throw new Exception('Furniture direction not allowed');
         }
 
-        if (!empty($tiles)) {
-            foreach ($tiles as $tile) {
-                $tile->setFurniture($furniture);
-                $this->entityManager->persist($tile);
-            }
+        $standardCoordinates = $this->setStandardOrientation($furniture);
+        $rotatedCoordinates = $this->rotate($standardCoordinates, $furniture->getRotation());
+        $tiles = $this->getTilesFromCoordinates($rotatedCoordinates, $startX, $startY);
 
-            $this->entityManager->flush();
+        $this->save($tiles, $furniture);
+    }
+
+    private function save(array $tiles, Furniture $furniture): void
+    {
+        foreach ($tiles as $tile) {
+            $tile->setFurniture($furniture);
+            $this->entityManager->persist($tile);
         }
+
+        $this->entityManager->flush();
     }
 }

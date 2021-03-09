@@ -12,6 +12,13 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Furniture
 {
+    const ANGLES = [
+        'North' => (M_PI / 2),
+        'West' => 0,
+        'East' => M_PI,
+        'South' => (M_PI / -2),
+    ];
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -95,6 +102,11 @@ class Furniture
         return $this->direction;
     }
 
+    public function getRotation(): float
+    {
+        return self::ANGLES[$this->getDirection()];
+    }
+    
     public function setDirection(string $direction): self
     {
         $this->direction = $direction;

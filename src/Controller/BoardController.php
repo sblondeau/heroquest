@@ -6,6 +6,7 @@ use App\Entity\Tile;
 use App\Repository\FurnitureRepository;
 use App\Repository\TileRepository;
 use App\Repository\HeroRepository;
+use App\Service\FurnitureOrganizer;
 use App\Service\MoveService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,8 +23,12 @@ class BoardController extends AbstractController
     /**
      * @Route("/", name="board")
      */
-    public function index(TileRepository $tileRepository, FurnitureRepository $furnitureRepository, HeroRepository $heroRepository): Response
-    {
+    public function index(
+        TileRepository $tileRepository,
+        FurnitureRepository $furnitureRepository,
+        HeroRepository $heroRepository,
+        FurnitureOrganizer $furnitureOrganizer
+        ): Response  {
         $tiles = $tileRepository->findAll();
         foreach ($tiles as $tile) {
             $tileCoords[$tile->getY()][$tile->getX()] = $tile;
@@ -35,9 +40,18 @@ class BoardController extends AbstractController
             }
         }
 
+        foreach ($furnitureRepository->findAll() as $furniture) {
+            [$x, $y] = $furnitureOrganizer->getRotationPoint($furniture);
+            $furnitures[] = [
+                'data' => $furniture, 
+                'rotationPoint' => [$x, $y]
+            ];
+        }
+
+
         return $this->render('board/index.html.twig', [
             'boardTiles' => $boardTiles,
-            'furnitures' => $furnitureRepository->findAll(),
+            'furnitures' => $furnitures,
         ]);
     }
 
