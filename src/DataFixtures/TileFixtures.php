@@ -92,7 +92,7 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
         }
         $manager->flush();
 
-       $this->furnitureOrganizer->organize(3,3,$this->getReference('table'));
+       $this->furnitureOrganizer->organize(7,1,$this->getReference('table'));
 
     }
 

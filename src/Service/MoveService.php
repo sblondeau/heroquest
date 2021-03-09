@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Character;
+use App\Entity\Furniture;
 use App\Entity\Tile;
 use App\Repository\TileRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,7 +39,7 @@ class MoveService
             throw new OutOfRangeException('Impossible move');
         }
         
-        if ($this->isFree($tile, $destinationTile, $direction) === true) {
+        if ($this->isNotFree($tile, $destinationTile, $direction) === true) {
             throw new RuntimeException('The way is not free');
         }
 
@@ -48,12 +49,14 @@ class MoveService
         $this->entityManager->flush();
     }
 
-    private function isFree(Tile $tile, Tile $destinationTile, string $direction)
+    private function isNotFree(Tile $tile, Tile $destinationTile, string $direction)
     {
         $getDirection = 'get'. $direction;
+
         $getInversedDirection = 'get'. self::INVERSED_DIRECTIONS[$direction];
         return
             $destinationTile->getOccupant() !== null ||
+            $destinationTile->getFurniture() instanceof Furniture ||
             in_array($tile->$getDirection(), ['wall', 'door']) ||
             in_array($destinationTile->$getInversedDirection(), ['wall', 'door']);
     }

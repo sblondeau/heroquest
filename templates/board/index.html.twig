@@ -10,7 +10,7 @@
 	<a href="{{path('move', {'direction': 'West'})}}">West</a>
 
 	<div class="board" style="--grid-columns:{{ constant('App\\Controller\\BoardController::BOARD_COLUMNS') }};
-														--grid-rows:{{ constant('App\\Controller\\BoardController::BOARD_ROWS') }};">
+																							--grid-rows:{{ constant('App\\Controller\\BoardController::BOARD_ROWS') }};">
 
 		{% set directions = ['north', 'south', 'east', 'west'] %}
 		{% for tile in boardTiles %}
@@ -19,24 +19,26 @@
                     {% for direction in directions|filter(direction => attribute(tile, direction) is not null ) %}
                         {{ direction }}-{{ attribute(tile, direction) }}
                     {% endfor %}
-                    " style="--tile-background:{{tile.room.color ?? 'grey'}}
-                    ">
-					{% if tile.occupant is not null %}
-						<div class="hero">{{ tile.occupant.name }}</div>
-					{% endif %}
-				</div>
+                    " 
+                    style="--tile-background:{{tile.room.color ?? 'grey'}};
+                            --tile-column: {{ tile.x }};
+                            --tile-row: {{ tile.y }};
+                    ">{{tile.furniture.name ?? ''}}</div>
 			{% else %}
 				<div class="tile"></div>
 			{% endif %}
 		{% endfor %}
-{{dump(furnitures)}}
+		{{dump(furnitures)}}
 		{% for furniture in furnitures %}
-			<div class="furniture" 
-                style="--furniture-column: {{furniture.rotationPoint.0}} / span {{furniture.data.width}};
-                       --furniture-row: {{furniture.rotationPoint.1}} / span {{furniture.data.height}};
-                       --furniture-rotate:{{furniture.data.rotation}}rad;"
-            >
+			<div class="furniture" style="--furniture-column: {{furniture.rotationPoint.0}} / span {{furniture.data.width}};
+                                        --furniture-row: {{furniture.rotationPoint.1}} / span {{furniture.data.height}};
+                                        --furniture-rotate:{{furniture.data.rotation}}rad;">
 				{{ furniture.data.name }}
+			</div>
+		{% endfor %}
+		{% for hero in heroes %}
+			<div class="hero" style="--hero-row: {{ hero.tile.y }}; --hero-column: {{ hero.tile.x }};">
+				{{ hero.name }}
 			</div>
 		{% endfor %}
 	</div>

@@ -32,6 +32,9 @@ class BoardController extends AbstractController
         $tiles = $tileRepository->findAll();
         foreach ($tiles as $tile) {
             $tileCoords[$tile->getY()][$tile->getX()] = $tile;
+            if ($tile->getOccupant() !== null) {
+                $heroes[] = $tile->getOccupant();
+            }
         }
 
         for ($y = 0; $y < self::BOARD_ROWS; $y++) {
@@ -52,6 +55,7 @@ class BoardController extends AbstractController
         return $this->render('board/index.html.twig', [
             'boardTiles' => $boardTiles,
             'furnitures' => $furnitures,
+            'heroes' => $heroes ?? [],
         ]);
     }
 
