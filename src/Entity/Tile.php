@@ -57,6 +57,11 @@ class Tile
      */
     private $occupant;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Furniture::class, inversedBy="tiles")
+     */
+    private $furniture;
+
 
     public function getId(): ?int
     {
@@ -155,6 +160,18 @@ class Tile
     public function setOccupant(?Hero $occupant): self
     {
         $this->occupant = $occupant;
+
+        return $this;
+    }
+
+    public function getFurniture(): ?Furniture
+    {
+        return $this->furniture;
+    }
+
+    public function setFurniture(?Furniture $furniture): self
+    {
+        $this->furniture = $furniture;
 
         return $this;
     }

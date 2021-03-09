@@ -7,6 +7,7 @@ use App\Entity\Tile;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use App\Service\FurnitureOrganizer;
 
 class TileFixtures extends Fixture implements DependentFixtureInterface
 {
@@ -15,6 +16,12 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
     const OPEN_DOOR = 'open-door';
 
     private array $board = [];
+    private FurnitureOrganizer $furnitureOrganizer;
+
+    public function __construct(FurnitureOrganizer $furnitureOrganizer)
+    {
+        $this->furnitureOrganizer = $furnitureOrganizer;
+    }
 
     private function makeRoom(string $roomColor, int $startX, int $endX, int $startY, int $endY): void
     {
@@ -58,6 +65,7 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
         $this->board[2][3]['occupant'] = 'dwarf';
         $this->board[2][4]['occupant'] = 'barbarian';
 
+        
         foreach ($this->board as $x => $tileYData) {
             foreach ($tileYData as $y => $tileData) {
                 $tile = new Tile();
@@ -82,8 +90,10 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
                 $manager->persist($tile);
             }
         }
-
         $manager->flush();
+
+       $this->furnitureOrganizer->organize(3,3,$this->getReference('table'));
+
     }
 
     public function getDependencies()
@@ -91,6 +101,7 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
         return [
             RoomFixtures::class,
             HeroFixtures::class,
+            FurnitureFixtures::class,
         ];
     }
 }

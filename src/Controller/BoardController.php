@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Tile;
+use App\Repository\FurnitureRepository;
 use App\Repository\TileRepository;
 use App\Repository\HeroRepository;
 use App\Service\MoveService;
@@ -21,7 +22,7 @@ class BoardController extends AbstractController
     /**
      * @Route("/", name="board")
      */
-    public function index(TileRepository $tileRepository, HeroRepository $heroRepository): Response
+    public function index(TileRepository $tileRepository, FurnitureRepository $furnitureRepository, HeroRepository $heroRepository): Response
     {
         $tiles = $tileRepository->findAll();
         foreach ($tiles as $tile) {
@@ -36,6 +37,7 @@ class BoardController extends AbstractController
 
         return $this->render('board/index.html.twig', [
             'boardTiles' => $boardTiles,
+            'furnitures' => $furnitureRepository->findAll(),
         ]);
     }
 

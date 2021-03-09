@@ -21,9 +21,12 @@
                     {% endfor %}
                     " style="--tile-background:{{tile.room.color ?? 'grey'}}
                 ">
-                        {% if tile.occupant is not null %}
-                            <div class="hero">{{ tile.occupant.name }}</div>
-                        {% endif %}
+                    {% if tile.occupant is not null %}
+                        <div class="hero">{{ tile.occupant.name }}</div>
+                    {% endif %}      
+                    {% if tile.furniture is not null %}
+                        <div class="furniture">{{ tile.furniture.name }}</div>
+                    {% endif %}
                 </div>
 			{% else %}
 				<div class="tile"></div>
