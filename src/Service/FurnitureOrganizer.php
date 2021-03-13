@@ -45,29 +45,14 @@ class FurnitureOrganizer
         return $newCoordinates ?? [];
     }
 
-    public function getRotationPoint(Furniture $furniture): array
+    public function getStartPoint(Furniture $furniture): array
     {
         foreach ($furniture->getTiles() as $tile) {
             $xCoordinates[] = $tile->getX();
             $yCoordinates[] = $tile->getY();
         }
 
-        switch ($furniture->getDirection()) {
-            case 'North':
-                $coordinates = [min($xCoordinates), max($yCoordinates)];
-                break;
-            case 'West':
-                $coordinates = [min($xCoordinates), min($yCoordinates)];
-                break;
-            case 'South':
-                $coordinates = [max($xCoordinates), min($yCoordinates)];
-                break;
-            case 'East':
-                $coordinates = [max($xCoordinates), max($yCoordinates)];
-                break;
-        }
-
-        return $coordinates ?? [];
+        return [min($xCoordinates), min($yCoordinates)];
     }
 
 

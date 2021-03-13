@@ -2,11 +2,13 @@
     --primary: rgb(129, 129, 129);
     --light: rgb(238, 236, 234);
     --dark: rgb(26, 26, 26);
+    --spacing: 4px;
 }
 
 * {
     box-sizing: border-box;
 }
+
 body {
     margin:0;
     background-color: var(--light);
@@ -25,8 +27,8 @@ body {
 }
 
 .tile {
-    grid-column: var(--tile-column);
-    grid-row: var(--tile-row);
+    grid-column: calc(var(--tile-column) + 1);
+    grid-row: calc(var(--tile-row) + 1);
     background-image: url('../images/tile.png');
     background-size: cover;
     background-color: var(--tile-background, var(--primary));
@@ -80,8 +82,8 @@ body {
 }
 
 .hero {
-    grid-column: var(--hero-column);
-    grid-row: var(--hero-row);
+    grid-column: calc(var(--hero-column) + 1);
+    grid-row: calc(var(--hero-row) + 1);
     width: 100%;
     height: 100%;
     background-color: var(--light);
@@ -90,8 +92,6 @@ body {
 }
 
 .furniture {
-    transform-origin: calc(var(--tile-size) /2) calc(var(--tile-size) /2);
-    rotate: calc(var(--furniture-rotate) * -1);
     grid-column: var(--furniture-column);
     grid-row: var(--furniture-row);
     background-color: rgba(0, 255, 255, 0.329);

@@ -23,16 +23,16 @@
                     style="--tile-background:{{tile.room.color ?? 'grey'}};
                             --tile-column: {{ tile.x }};
                             --tile-row: {{ tile.y }};
-                    ">{{tile.furniture.name ?? ''}}</div>
+                    ">{{ tile.furniture.name ?? '' }}</div>
 			{% else %}
 				<div class="tile"></div>
 			{% endif %}
 		{% endfor %}
-		{{dump(furnitures)}}
+
 		{% for furniture in furnitures %}
-			<div class="furniture" style="--furniture-column: {{furniture.rotationPoint.0}} / span {{furniture.data.width}};
-                                        --furniture-row: {{furniture.rotationPoint.1}} / span {{furniture.data.height}};
-                                        --furniture-rotate:{{furniture.data.rotation}}rad;">
+			<div class="furniture" style="--furniture-column: {{furniture.startPoint.0 + 1}} / span {{furniture.data.renderWidth}};
+                                        --furniture-row: {{furniture.startPoint.1 + 1}} / span {{furniture.data.renderHeight}};
+										--furniture-direction: 
 				{{ furniture.data.name }}
 			</div>
 		{% endfor %}

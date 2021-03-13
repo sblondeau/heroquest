@@ -44,10 +44,10 @@ class BoardController extends AbstractController
         }
 
         foreach ($furnitureRepository->findAll() as $furniture) {
-            [$x, $y] = $furnitureOrganizer->getRotationPoint($furniture);
+            [$x, $y] = $furnitureOrganizer->getStartPoint($furniture);
             $furnitures[] = [
                 'data' => $furniture, 
-                'rotationPoint' => [$x, $y]
+                'startPoint' => [$x, $y]
             ];
         }
 

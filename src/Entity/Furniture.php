@@ -90,6 +90,27 @@ class Furniture
         return $this->height;
     }
 
+    private function isVertical()
+    {
+        return in_array($this->getDirection(), ['North', 'South']);
+    }
+
+    public function getRenderHeight(): ?int
+    {
+        if($this->isVertical()) {
+            return $this->width;
+        }
+        return $this->height;
+    }
+
+    public function getRenderWidth(): ?int
+    {
+        if($this->isVertical()) {
+            return $this->height;
+        }
+        return $this->width;
+    }
+
     public function setHeight(int $height): self
     {
         $this->height = $height;
