@@ -56,13 +56,40 @@ class FurnitureOrganizer
     }
 
 
+    private function hasNoWall(array $tiles)
+    {
+        foreach ($tiles as $tile) {
+            $xCoordinates[] = $tile->getX();
+            $yCoordinates[] = $tile->getY();
+        }
+
+        $startX = min($xCoordinates);
+        $endX = max($xCoordinates);
+        $startY = min($yCoordinates);
+        $endY = max($yCoordinates);
+
+        foreach ($tiles as $tile) {
+            if (
+                (($tile->getNorth() !== null) && ($tile->getY() !== $startY)) ||
+                (($tile->getSouth() !== null) && ($tile->getY() !== $endY)) ||
+                (($tile->getEast() !== null) && ($tile->getX() !== $endX)) ||
+                (($tile->getWest() !== null) && ($tile->getX() !== $startX))
+                ) {
+                throw new Exception('The furniture can not overlap a wall on tile '. $tile->getX() . ',' . $tile->getY());
+            }
+        }
+    }
+
     private function getTilesFromCoordinates(array $coordinates, int $startX, int $startY): array
     {
         foreach ($coordinates as $coordinate) {
             [$x, $y] = $coordinate;
             $tile = $this->tileRepository->findOneBy(['x' => $x + $startX, 'y' => $y + $startY]);
             if (!$tile instanceof Tile) {
-                throw new Exception('Impossible to place furniture here');
+                throw new Exception('You should place furniture only on tiles');
+            }
+            if ($tile->getFurniture() !== null) {
+                throw new Exception('You could not place furniture on not empty tiles');
             }
 
             $tiles[] = $tile;
@@ -80,6 +107,8 @@ class FurnitureOrganizer
         $standardCoordinates = $this->setStandardOrientation($furniture);
         $rotatedCoordinates = $this->rotate($standardCoordinates, $furniture->getRotation());
         $tiles = $this->getTilesFromCoordinates($rotatedCoordinates, $startX, $startY);
+
+        $this->hasNoWall($tiles);
 
         $this->save($tiles, $furniture);
     }
