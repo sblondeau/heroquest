@@ -20,38 +20,14 @@ class Hero extends Character
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $name;
-
-    /**
      * @ORM\OneToOne(targetEntity=Tile::class, mappedBy="occupant", cascade={"persist", "remove"})
      */
     private $tile;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $hasPlayedThisTurn;
-
 
     public function getId(): ?int
     {
         return $this->id;
     }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
 
     public function getTile(): ?Tile
     {
@@ -71,18 +47,6 @@ class Hero extends Character
         }
 
         $this->tile = $tile;
-
-        return $this;
-    }
-
-    public function getHasPlayedThisTurn(): ?bool
-    {
-        return $this->hasPlayedThisTurn;
-    }
-
-    public function setHasPlayedThisTurn(bool $hasPlayedThisTurn): self
-    {
-        $this->hasPlayedThisTurn = $hasPlayedThisTurn;
 
         return $this;
     }

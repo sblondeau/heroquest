@@ -8,6 +8,7 @@ use App\Repository\TileRepository;
 use App\Repository\HeroRepository;
 use App\Service\FurnitureOrganizer;
 use App\Service\MoveService;
+use App\Service\TurnService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -26,7 +27,7 @@ class BoardController extends AbstractController
     public function index(
         TileRepository $tileRepository,
         FurnitureRepository $furnitureRepository,
-        HeroRepository $heroRepository,
+        TurnService $turnService,
         FurnitureOrganizer $furnitureOrganizer
         ): Response  {
         $tiles = $tileRepository->findAll();
@@ -56,18 +57,19 @@ class BoardController extends AbstractController
             'boardTiles' => $boardTiles,
             'furnitures' => $furnitures,
             'heroes' => $heroes ?? [],
+            'currentHero' => $turnService->currentHero(),
         ]);
     }
 
     /**
      * @Route("/move/{direction<North|South|East|West>}", name="move")
      */
-    public function move(HeroRepository $heroRepository, MoveService $moveService, string $direction)
+    public function move(HeroRepository $heroRepository, MoveService $moveService, TurnService $turnService, string $direction)
     {
-        $occupant = $heroRepository->findOneBy([]);
-        
+        $currentHero = $turnService->currentHero();
+
         try {
-            $moveService->move($occupant, $direction);
+            $moveService->move($currentHero, $direction);
         } catch (Exception $exception) {
             $this->addFlash('danger', $exception->getMessage());
         }

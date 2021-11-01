@@ -4,6 +4,7 @@
 {% endblock %}
 
 {% block body %}
+	{{ currentHero.name }}
 	<a href="{{path('move', {'direction': 'North'})}}">North</a>
 	<a href="{{path('move', {'direction': 'East'})}}">East</a>
 	<a href="{{path('move', {'direction': 'South'})}}">South</a>
