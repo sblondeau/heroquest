@@ -29,6 +29,11 @@ class Hero extends Character
      */
     private $tile;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $hasPlayedThisTurn;
+
 
     public function getId(): ?int
     {
@@ -66,6 +71,18 @@ class Hero extends Character
         }
 
         $this->tile = $tile;
+
+        return $this;
+    }
+
+    public function getHasPlayedThisTurn(): ?bool
+    {
+        return $this->hasPlayedThisTurn;
+    }
+
+    public function setHasPlayedThisTurn(bool $hasPlayedThisTurn): self
+    {
+        $this->hasPlayedThisTurn = $hasPlayedThisTurn;
 
         return $this;
     }

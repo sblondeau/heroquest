@@ -62,7 +62,7 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
         
         $this->board[3][2]['borders'][1] = self::OPEN_DOOR;
         $this->board[5][3]['borders'][3] = self::OPEN_DOOR;
-        $this->board[2][3]['occupant'] = 'dwarf';
+        $this->board[2][5]['occupant'] = 'dwarf';
         $this->board[2][4]['occupant'] = 'barbarian';
 
         

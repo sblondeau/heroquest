@@ -65,6 +65,7 @@ class BoardController extends AbstractController
     public function move(HeroRepository $heroRepository, MoveService $moveService, string $direction)
     {
         $occupant = $heroRepository->findOneBy([]);
+        
         try {
             $moveService->move($occupant, $direction);
         } catch (Exception $exception) {

@@ -43,7 +43,7 @@ class MoveService
             throw new RuntimeException('The way is not free');
         }
 
-        $destinationTile->setOccupant($tile->getOccupant());
+        $destinationTile->setOccupant($character);
         $tile->setOccupant(null);
         $this->entityManager->persist($tile);
         $this->entityManager->flush();

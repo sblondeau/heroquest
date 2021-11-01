@@ -12,11 +12,13 @@ class HeroFixtures extends Fixture
     {
         $dwarf = new Hero;
         $dwarf->setName('Dwarf');
+        $dwarf->setHasPlayedThisTurn(true);
         $this->addReference('dwarf', $dwarf);
         $manager->persist($dwarf);
         
         $barbarian = new Hero;
         $barbarian->setName('Barbarian');
+        $barbarian->setHasPlayedThisTurn(false);
         $this->addReference('barbarian', $barbarian);
         $manager->persist($barbarian);
 
