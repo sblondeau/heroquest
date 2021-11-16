@@ -52,7 +52,6 @@ class BoardController extends AbstractController
             ];
         }
 
-
         return $this->render('board/index.html.twig', [
             'boardTiles' => $boardTiles,
             'furnitures' => $furnitures,
@@ -64,7 +63,7 @@ class BoardController extends AbstractController
     /**
      * @Route("/move/{direction<North|South|East|West>}", name="move")
      */
-    public function move(HeroRepository $heroRepository, MoveService $moveService, TurnService $turnService, string $direction)
+    public function move(MoveService $moveService, TurnService $turnService, string $direction)
     {
         $currentHero = $turnService->currentHero();
 

@@ -4,27 +4,51 @@ namespace App\Service;
 
 use App\Entity\Character;
 use App\Repository\HeroRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class TurnService
 {
-    private HeroRepository $heroRepository;
+    const DICE_FACES = 6;
 
-    public function __construct(HeroRepository $heroRepository)
+    private HeroRepository $heroRepository;
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(HeroRepository $heroRepository, EntityManagerInterface $entityManager)
     {
         $this->heroRepository = $heroRepository;
+        $this->entityManager = $entityManager;
     }
 
     public function currentHero()
     {
         $this->checkIfEndOfTurn();
-        return $this->heroRepository->findOneBy(['hasPlayedThisTurn' => 0]);
+        $currentHero = $this->heroRepository->findOneBy(['hasPlayedThisTurn' => 0]);
+
+        return $currentHero;
     }
 
     private function checkIfEndOfTurn()
     {
-        if(!$this->heroRepository->findOneBy(['hasPlayedThisTurn' => 0]) instanceof Character)
-        {
-            $this->heroRepository->resetTurn();
+        if (!$this->heroRepository->findOneBy(['hasPlayedThisTurn' => 0]) instanceof Character) {
+            $characters = $this->heroRepository->findAll();
+            foreach($characters as $character) {
+                $character->setHasPlayedThisTurn(0);
+                $character->setRemainingMove($this->launchDice($character->getMoveDiceNumber()));
+                $this->entityManager->persist($character);
+            }
+
+            $this->entityManager->flush();
         }
     }
+
+    private function launchDice(int $numberOfDices = 2)
+    {
+        $diceResult = 0;
+        for ($i = 0; $i < $numberOfDices; $i++) {
+            $diceResult += rand(1, 6);
+        }
+
+        return $diceResult;
+    }
+    
 }

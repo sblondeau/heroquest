@@ -45,7 +45,12 @@ class MoveService
 
         $destinationTile->setOccupant($character);
         $tile->setOccupant(null);
-        $character->setHasPlayedThisTurn(1);
+        $character->setRemainingMove($character->getRemainingMove() - 1);
+        if($character->getRemainingMove() <= 0) {
+            $character->setHasPlayedThisTurn(1);
+            $character->setRemainingMove(0);
+        }
+
         $this->entityManager->persist($character);
         $this->entityManager->persist($tile);
         $this->entityManager->flush();

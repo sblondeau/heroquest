@@ -19,11 +19,6 @@ class HeroRepository extends ServiceEntityRepository
         parent::__construct($registry, Hero::class);
     }
 
-    public function resetTurn()
-    {        
-        $qb = $this->createQueryBuilder('h')->update()->set('h.hasPlayedThisTurn', 0)->getQuery();
-        $qb->execute();
-    }
     // /**
     //  * @return Hero[] Returns an array of Hero objects
     //  */
