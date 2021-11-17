@@ -72,6 +72,7 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
 
                 $tile->setX($x);
                 $tile->setY($y);
+                $tile->setVisible(false);
 
                 if (key_exists('borders', $tileData)) {
                     [$north, $east, $south, $west] = $tileData['borders'];

@@ -44,6 +44,7 @@ class MoveService
         }
 
         $destinationTile->setOccupant($character);
+        $destinationTile->setVisible(true);
         $tile->setOccupant(null);
         $character->setRemainingMove($character->getRemainingMove() - 1);
         if($character->getRemainingMove() <= 0) {

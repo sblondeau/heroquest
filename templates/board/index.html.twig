@@ -21,11 +21,12 @@
                     {% for direction in directions|filter(direction => attribute(tile, direction) is not null ) %}
                         {{ direction }}-{{ attribute(tile, direction) }}
                     {% endfor %}
+					{{ tile.isVisible ? 'visible' }}
                     " 
                     style="--tile-background:{{tile.room.color ?? 'grey'}};
                             --tile-column: {{ tile.x }};
                             --tile-row: {{ tile.y }};
-                    ">{{ tile.furniture.name ?? '' }}</div>
+                    "></div>
 			{% else %}
 				<div class="tile"></div>
 			{% endif %}

@@ -2,7 +2,13 @@
     --primary: rgb(129, 129, 129);
     --light: rgb(238, 236, 234);
     --dark: rgb(26, 26, 26);
+    --fog: rgba(26, 26, 26, 0.836);
     --spacing: 4px;
+
+    --z-furniture: 1;
+    --z-hero: 10;
+    --z-fog: 5;
+    --z-visible: 0;
 }
 
 * {
@@ -32,15 +38,23 @@ body {
     background-image: url('../images/tile.png');
     background-size: cover;
     background-color: var(--tile-background, var(--primary));
+    filter: contrast(50%) brightness(50%);
     width: var(--tile-size);
     height: var(--tile-size);
     display: flex;
     justify-content: center;
     align-items: stretch;
-    padding:10%;
     box-shadow: 0px 0px 4px  inset var(--dark);
-    z-index: 0;
+    z-index: var(--z-fog);
 }
+
+.visible {
+    z-index: var(--z-visible);
+    filter: none;
+}
+
+
+
 
 .north-wall {
     border-top: var(--wall-border);
@@ -88,12 +102,15 @@ body {
     height: 100%;
     background-color: var(--light);
     border-radius: 50%;
-    z-index:2;
+    z-index: var(--z-hero);
 }
 
 .furniture {
     grid-column: var(--furniture-column);
     grid-row: var(--furniture-row);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: rgba(0, 255, 255, 0.329);
-    z-index: 1;
+    z-index: var(--z-furniture);
 }

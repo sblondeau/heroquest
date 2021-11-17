@@ -41,7 +41,6 @@ class TurnService
         }
     }
 
-
     private function launchDice(int $numberOfDices = 2)
     {
         $diceResult = 0;

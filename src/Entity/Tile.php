@@ -62,6 +62,11 @@ class Tile
      */
     private $furniture;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $visible;
+
 
     public function getId(): ?int
     {
@@ -172,6 +177,18 @@ class Tile
     public function setFurniture(?Furniture $furniture): self
     {
         $this->furniture = $furniture;
+
+        return $this;
+    }
+
+    public function isVisible(): ?bool
+    {
+        return $this->visible;
+    }
+
+    public function setVisible(bool $visible): self
+    {
+        $this->visible = $visible;
 
         return $this;
     }
