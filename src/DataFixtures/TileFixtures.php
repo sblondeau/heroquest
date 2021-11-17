@@ -59,13 +59,13 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
                 $this->board[$x][$y] ??= [];
             }
         }
-        
+
         $this->board[3][2]['borders'][1] = self::OPEN_DOOR;
         $this->board[5][3]['borders'][3] = self::OPEN_DOOR;
         $this->board[2][5]['occupant'] = 'dwarf';
         $this->board[2][4]['occupant'] = 'barbarian';
 
-        
+
         foreach ($this->board as $x => $tileYData) {
             foreach ($tileYData as $y => $tileData) {
                 $tile = new Tile();
@@ -86,15 +86,18 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
                     $tile->setOccupant($this->getReference($tileData['occupant']));
                 }
 
-                $tile->setRoom($this->getReference($tileData['room'] ?? 'passage'));
+                if (isset($tileData['room']) && $this->hasReference($tileData['room'])) {
+                    $tile->setRoom($this->getReference($tileData['room']));
+                } else {
+                    $tile->setRoom(null);
+                }
 
                 $manager->persist($tile);
             }
         }
         $manager->flush();
 
-       $this->furnitureOrganizer->organize(7,1,$this->getReference('table'));
-
+        $this->furnitureOrganizer->organize(7, 1, $this->getReference('table'));
     }
 
     public function getDependencies()

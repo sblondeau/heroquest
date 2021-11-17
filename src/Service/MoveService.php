@@ -16,13 +16,17 @@ class MoveService
     public const DIRECTIONS = ['North' => [0, -1], 'East' => [1, 0], 'South' => [0, 1], 'West' => [-1, 0]];
     public const INVERSED_DIRECTIONS = ['North' => 'South', 'East' => 'West', 'South' => 'North', 'West' => 'East'];
 
-    private $tileRepository;
+    private TileRepository $tileRepository;
+    private VisibilityService $visibilityService;
+    private EntityManagerInterface $entityManager;
 
-    private $entityManager;
-
-    public function __construct(TileRepository $tileRepository, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        TileRepository $tileRepository,
+        EntityManagerInterface $entityManager,
+        VisibilityService $visibilityService
+    ) {
         $this->tileRepository = $tileRepository;
+        $this->visibilityService = $visibilityService;
         $this->entityManager = $entityManager;
     }
 
@@ -38,30 +42,29 @@ class MoveService
         if (!$destinationTile instanceof Tile) {
             throw new OutOfRangeException('Impossible move');
         }
-        
+
         if ($this->isNotFree($tile, $destinationTile, $direction) === true) {
             throw new RuntimeException('The way is not free');
         }
 
         $destinationTile->setOccupant($character);
-        $destinationTile->setVisible(true);
+        $this->visibilityService->changeVisibility($destinationTile);
+
         $tile->setOccupant(null);
         $character->setRemainingMove($character->getRemainingMove() - 1);
-        if($character->getRemainingMove() <= 0) {
+        if ($character->getRemainingMove() <= 0) {
             $character->setHasPlayedThisTurn(1);
             $character->setRemainingMove(0);
         }
 
-        $this->entityManager->persist($character);
-        $this->entityManager->persist($tile);
         $this->entityManager->flush();
     }
 
     private function isNotFree(Tile $tile, Tile $destinationTile, string $direction)
     {
-        $getDirection = 'get'. $direction;
+        $getDirection = 'get' . $direction;
 
-        $getInversedDirection = 'get'. self::INVERSED_DIRECTIONS[$direction];
+        $getInversedDirection = 'get' . self::INVERSED_DIRECTIONS[$direction];
         return
             $destinationTile->getOccupant() !== null ||
             $destinationTile->getFurniture() instanceof Furniture ||
