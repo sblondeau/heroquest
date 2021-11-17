@@ -19,12 +19,12 @@ class TurnService
         $this->entityManager = $entityManager;
     }
 
-    public function currentHero()
+    public function currentCharacter()
     {
         $this->checkIfEndOfTurn();
-        $currentHero = $this->heroRepository->findOneBy(['hasPlayedThisTurn' => 0]);
+        $currentCharacter = $this->heroRepository->findOneBy(['hasPlayedThisTurn' => 0]);
 
-        return $currentHero;
+        return $currentCharacter;
     }
 
     private function checkIfEndOfTurn()
@@ -40,6 +40,7 @@ class TurnService
             $this->entityManager->flush();
         }
     }
+
 
     private function launchDice(int $numberOfDices = 2)
     {

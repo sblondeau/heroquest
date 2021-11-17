@@ -4,11 +4,12 @@
 {% endblock %}
 
 {% block body %}
-	{{ currentHero.name }} {{ currentHero.remainingMove }}
+	{{ currentCharacter.name }} {{ currentCharacter.remainingMove }}
 	<a href="{{path('move', {'direction': 'North'})}}">North</a>
 	<a href="{{path('move', {'direction': 'East'})}}">East</a>
 	<a href="{{path('move', {'direction': 'South'})}}">South</a>
 	<a href="{{path('move', {'direction': 'West'})}}">West</a>
+	<a href="{{path('end_turn')}}">End of Turn</a>
 
 	<div class="board" style="--grid-columns:{{ constant('App\\Controller\\BoardController::BOARD_COLUMNS') }};
 																							--grid-rows:{{ constant('App\\Controller\\BoardController::BOARD_ROWS') }};">

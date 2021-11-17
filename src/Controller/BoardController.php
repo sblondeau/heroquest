@@ -2,14 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Tile;
 use App\Repository\FurnitureRepository;
 use App\Repository\TileRepository;
-use App\Repository\HeroRepository;
 use App\Service\FurnitureOrganizer;
 use App\Service\MoveService;
 use App\Service\TurnService;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,7 +26,7 @@ class BoardController extends AbstractController
         FurnitureRepository $furnitureRepository,
         TurnService $turnService,
         FurnitureOrganizer $furnitureOrganizer
-        ): Response  {
+    ): Response {
         $tiles = $tileRepository->findAll();
         foreach ($tiles as $tile) {
             $tileCoords[$tile->getY()][$tile->getX()] = $tile;
@@ -47,7 +44,7 @@ class BoardController extends AbstractController
         foreach ($furnitureRepository->findAll() as $furniture) {
             [$x, $y] = $furnitureOrganizer->getStartPoint($furniture);
             $furnitures[] = [
-                'data' => $furniture, 
+                'data' => $furniture,
                 'startPoint' => [$x, $y]
             ];
         }
@@ -56,8 +53,21 @@ class BoardController extends AbstractController
             'boardTiles' => $boardTiles,
             'furnitures' => $furnitures,
             'heroes' => $heroes ?? [],
-            'currentHero' => $turnService->currentHero(),
+            'currentCharacter' => $turnService->currentCharacter(),
         ]);
+    }
+
+    /**
+     * @Route("/end-of-turn", name="end_turn")
+     */
+    public function endOfTurn(TurnService $turnService, EntityManagerInterface $entityManager)
+    {
+        $currentCharacter = $turnService->currentCharacter();
+        $currentCharacter->setHasPlayedThisTurn(1)->setRemainingMove(0);
+        $entityManager->persist($currentCharacter);
+        $entityManager->flush();
+        
+        return $this->redirectToRoute('board');
     }
 
     /**
@@ -65,10 +75,10 @@ class BoardController extends AbstractController
      */
     public function move(MoveService $moveService, TurnService $turnService, string $direction)
     {
-        $currentHero = $turnService->currentHero();
+        $currentCharacter = $turnService->currentCharacter();
 
         try {
-            $moveService->move($currentHero, $direction);
+            $moveService->move($currentCharacter, $direction);
         } catch (Exception $exception) {
             $this->addFlash('danger', $exception->getMessage());
         }
