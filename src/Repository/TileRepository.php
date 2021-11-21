@@ -19,22 +19,15 @@ class TileRepository extends ServiceEntityRepository
         parent::__construct($registry, Tile::class);
     }
 
-    // /**
-    //  * @return Tile[] Returns an array of Tile objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findMaskingTiles()
     {
         return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('t.id', 'ASC')
-            ->setMaxResults(10)
+            ->orWhere('t.room != null')
+            ->orWhere('t.occupant != null')
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Tile

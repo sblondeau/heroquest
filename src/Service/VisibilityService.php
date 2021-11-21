@@ -18,38 +18,40 @@ class VisibilityService
 
     private TileRepository $tileRepository;
     private RoomRepository $roomRepository;
+    private ReachabilityService $reachabilityService;
     private EntityManagerInterface $entityManager;
 
     public function __construct(
         TileRepository $tileRepository,
         EntityManagerInterface $entityManager,
-        RoomRepository $roomRepository
+        RoomRepository $roomRepository,
+        ReachabilityService $reachabilityService
     ) {
         $this->tileRepository = $tileRepository;
         $this->roomRepository = $roomRepository;
         $this->entityManager = $entityManager;
+        $this->reachabilityService = $reachabilityService;
     }
 
     public function changeVisibility(Tile $tile): void
     {
-        $visibleTiles = $this->roomVisibility($tile);
+        $roomTiles = $this->roomVisibility($tile);
+        $corridorTiles = $this->reachabilityService->corridorVisibility($tile);
+        $visibleTiles = array_merge($roomTiles, $corridorTiles);
         $visibleTiles[] = $tile;
         foreach ($visibleTiles as $visibleTile) {
             $visibleTile->setVisible(true);
         }
     }
 
-    private function roomVisibility(Tile $tile)
+    private function roomVisibility(Tile $tile): array
     {
-        $roomTiles = [];
         if ($tile->getRoom() instanceof Room) {
-            $roomTiles = $tile->getRoom()->getTiles();
+            $roomTiles = $tile->getRoom()->getTiles()->toArray();
         }
 
-        return $roomTiles;
+        return $roomTiles ?? [];
     }
 
-    private function corridorVisibility(Tile $tile): void
-    {
-    }
+   
 }
