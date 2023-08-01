@@ -7,7 +7,7 @@ use App\Entity\Tile;
 use App\Repository\TileRepository;
 use App\Service\MoveService;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
+use RuntimeException;
 
 class FurnitureOrganizer
 {
@@ -75,7 +75,7 @@ class FurnitureOrganizer
                 (($tile->getEast() !== null) && ($tile->getX() !== $endX)) ||
                 (($tile->getWest() !== null) && ($tile->getX() !== $startX))
                 ) {
-                throw new Exception('The furniture can not overlap a wall on tile '. $tile->getX() . ',' . $tile->getY());
+                throw new RuntimeException('The furniture can not overlap a wall on tile '. $tile->getX() . ',' . $tile->getY());
             }
         }
     }
@@ -86,10 +86,10 @@ class FurnitureOrganizer
             [$x, $y] = $coordinate;
             $tile = $this->tileRepository->findOneBy(['x' => $x + $startX, 'y' => $y + $startY]);
             if (!$tile instanceof Tile) {
-                throw new Exception('You should place furniture only on tiles');
+                throw new RuntimeException('You should place furniture only on tiles');
             }
             if ($tile->getFurniture() !== null) {
-                throw new Exception('You could not place furniture on not empty tiles');
+                throw new RuntimeException('You could not place furniture on not empty tiles');
             }
 
             $tiles[] = $tile;
@@ -101,7 +101,7 @@ class FurnitureOrganizer
     public function organize(int $startX, int $startY, Furniture $furniture)
     {
         if (!key_exists($furniture->getDirection(), MoveService::DIRECTIONS)) {
-            throw new Exception('Furniture direction not allowed');
+            throw new RuntimeException('Furniture direction not allowed');
         }
 
         $standardCoordinates = $this->setStandardOrientation($furniture);

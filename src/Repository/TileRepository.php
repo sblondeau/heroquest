@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Tile;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
+use PhpParser\ErrorHandler\Collecting;
 
 /**
  * @method Tile|null find($id, $lockMode = null, $lockVersion = null)
@@ -22,22 +24,10 @@ class TileRepository extends ServiceEntityRepository
     public function findMaskingTiles()
     {
         return $this->createQueryBuilder('t')
-            ->orWhere('t.room != null')
-            ->orWhere('t.occupant != null')
+            ->orWhere('t.room is not null')
+            // ->orWhere('t.occupant is not null')
             ->getQuery()
             ->getResult()
         ;
     }
-
-    /*
-    public function findOneBySomeField($value): ?Tile
-    {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

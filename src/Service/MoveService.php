@@ -7,6 +7,7 @@ use App\Entity\Furniture;
 use App\Entity\Tile;
 use App\Repository\TileRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use OutOfBoundsException;
 use OutOfRangeException;
 use RangeException;
 use RuntimeException;
@@ -17,16 +18,13 @@ class MoveService
     public const INVERSED_DIRECTIONS = ['North' => 'South', 'East' => 'West', 'South' => 'North', 'West' => 'East'];
 
     private TileRepository $tileRepository;
-    private VisibilityService $visibilityService;
     private EntityManagerInterface $entityManager;
 
     public function __construct(
         TileRepository $tileRepository,
-        EntityManagerInterface $entityManager,
-        VisibilityService $visibilityService
+        EntityManagerInterface $entityManager
     ) {
         $this->tileRepository = $tileRepository;
-        $this->visibilityService = $visibilityService;
         $this->entityManager = $entityManager;
     }
 
@@ -40,7 +38,7 @@ class MoveService
             'y' => $tile->getY() + $yModifier
         ]);
         if (!$destinationTile instanceof Tile) {
-            throw new OutOfRangeException('Impossible move');
+            throw new OutOfBoundsException('Impossible move');
         }
 
         if ($this->isNotFree($tile, $destinationTile, $direction) === true) {
@@ -48,9 +46,8 @@ class MoveService
         }
 
         $destinationTile->setOccupant($character);
-        $this->visibilityService->changeVisibility($destinationTile);
+        $tile->setOccupant(null); 
 
-        $tile->setOccupant(null);
         $character->setRemainingMove($character->getRemainingMove() - 1);
         if ($character->getRemainingMove() <= 0) {
             $character->setHasPlayedThisTurn(1);

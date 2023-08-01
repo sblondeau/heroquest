@@ -9,118 +9,160 @@ class ReachabilityService
 {
     private TileRepository $tileRepository;
 
+    private array $reachableTiles = [];
+
     public function __construct(TileRepository $tileRepository)
     {
         $this->tileRepository = $tileRepository;
     }
 
-    public function corridorVisibility(Tile $currentTile): array
+    /**
+     * Get all tiles and calculate distances and angles from current tile
+     */
+    private function initializeReachableTiles(Tile $currentTile): void
     {
-        if ($currentTile->getRoom() !== null) {
-            return [];
-        }
-
         $tiles = $this->tileRepository->findAll();
         foreach ($tiles as $tile) {
-            $reachableTiles[$tile->getId()] = [
+            // TODO manage intemediate status (visible once but not reachable)
+            $tile->setVisible(false);
+            $this->reachableTiles[$tile->getId()] = [
                 'distance' => $this->tileDistance($currentTile, $tile),
                 'angle' => $this->tileAngle($currentTile, $tile),
                 'reachable' => true,
             ];
         }
+    }
+
+    public function corridorReachability(Tile $currentTile): array
+    {
+        if ($currentTile->getRoom() !== null) {
+            return [];
+        }
+
+        $this->initializeReachableTiles($currentTile);
 
         $maskingTiles = $this->getMaskingTilesInfos($currentTile);
+ 
         foreach ($maskingTiles as $maskingKey => $maskingTile) {
-            foreach ($reachableTiles as $reachableTileKey => $reachableTile) {
+            $this->reachableTiles[$maskingKey]['reachable'] = false;
+            foreach ($this->reachableTiles as $reachableTileKey => $reachableTile) {
                 if (
-                    $tile['angle'] > $maskingTile['startAngle'] &&
+                    $reachableTile['reachable'] &&
+                    $reachableTile['angle'] > $maskingTile['startAngle'] &&
                     $reachableTile['angle'] < $maskingTile['endAngle'] &&
-                    $reachableTile['distance'] > $reachableTiles[$maskingKey]['distance']
+                    $reachableTile['distance'] > $this->reachableTiles[$maskingKey]['distance']
                 ) {
-                    $reachableTiles[$reachableTileKey] = false;
+                    $this->reachableTiles[$reachableTileKey]['reachable'] = false;
                 }
             }
         }
-
-        foreach ($reachableTiles as $reachableTile) {
-            if ($reachableTile['visibility']) {
-                $visibleTiles[] = $reachableTile;
+        // $this->reachableTiles[$currentTile->getId()]['reachable'] = true;
+        foreach ($this->reachableTiles as $reachableTileKey => $reachableTile) {
+            if ($reachableTile['reachable']) {
+                $visibleTiles[] = $this->tileRepository->find($reachableTileKey);
             }
         }
 
         return $visibleTiles ?? [];
     }
 
-    private function tileDistance(Tile $from, Tile $to)
+    /**
+     * Get distance beetween two tiles
+     */
+    public function tileDistance(Tile $from, Tile $to): float
     {
-        $xDistance = ($from->getX() - $to->getX()) ** 2;
-        $yDistance = ($from->getY() - $to->getY()) ** 2;
-
-        return sqrt($xDistance + $yDistance);
+        return MathService::distance($from->getX(), $from->getY(), $to->getX(), $to->getY());
     }
 
-    private function tileAngle(Tile $from, Tile $to)
+    /**
+     * Get angle beetwen two tiles
+     */
+    public function tileAngle(Tile $from, Tile $to): float
     {
-        return $this->angle($from->getX(), $from->getY(), $to->getX(), $to->getY());
+        return MathService::angle($from->getX(), $from->getY(), $to->getX(), $to->getY());
     }
 
-    private function angle(int $fromX, int $fromY, int $toX, int $toY)
-    {
-        $xDistance = $fromX - $toX;
-        $yDistance = $fromY - $toY;
-        if ($xDistance === 0) {
-            return 0;
-        } else {
-            return atan($yDistance / $xDistance);
-        }
-    }
-
-    private function getMaskingTilesInfos(Tile $currentTile)
+    /**
+     * Get all tiles masked by another not visible tile (room, monster...)
+     */
+    private function getMaskingTilesInfos(Tile $currentTile): array
     {
         $fromX = $currentTile->getX() + 0.5;
         $fromY = $currentTile->getY() + 0.5;
 
         $maskingTiles = $this->tileRepository->findMaskingTiles();
 
-        foreach ($maskingTiles as $tile) {
-            [$angleStartX, $angleStartY, $angleEndX, $angleEndY] = $this->getMaskingAngles($currentTile, $tile);
-            $maskingAngles[$tile->getId()] = [
-                'startAngle' => $this->angle($fromX, $angleStartX, $fromY, $angleStartY),
-                'endAngle' => $this->angle($fromX, $angleEndX, $fromY, $angleEndY),
+        foreach ($maskingTiles as $maskingTile) {
+            [$cornerStartX, $cornerStartY, $cornerEndX, $cornerEndY] = $this->getMaskingCorners($currentTile, $maskingTile);
+            $firstAngle = MathService::angle($fromX, $fromY, $cornerStartX, $cornerStartY);
+            $lastAngle = MathService::angle($fromX, $fromY, $cornerEndX, $cornerEndY);
+            $maskingAngles[$maskingTile->getId()] = [
+                'tile' => $maskingTile,
+                'startAngle' => $firstAngle,
+                'endAngle' => $lastAngle,
+                'coords' => [$maskingTile->getX(), $maskingTile->getY()]
             ];
         }
 
-        return $maskingTiles;
+        return $maskingAngles;
     }
 
-    private function getMaskingAngles(Tile $currentTile, Tile $maskingTile)
+    /**
+     * Get corners coords according to the orientation between the current tile and the masking tile
+     */
+    private function getMaskingCorners(Tile $currentTile, Tile $maskingTile): array
     {
+        //cornerStartX, $cornerStartY, $cornerEndX, $cornerEndY
+        $coeffs = [0, 0, 0, 0];
         // M * 
         // * C
         if ($currentTile->getX() > $maskingTile->getX() && $currentTile->getY() > $maskingTile->getY()) {
-            $coeffs = [0.5, -0.5, -0.5, 0.5];
+            $coeffs = [1, 0, 0, 1];
         }
         // * C 
         // M *
         if ($currentTile->getX() > $maskingTile->getX() && $currentTile->getY() < $maskingTile->getY()) {
-            $coeffs = [-0.5, -0.5, 0.5, 0.5];
+            $coeffs = [0, 0, 1, 1];
         }
         // * M 
         // C *
-        if ($currentTile->getX() < $maskingTile->getX() && $currentTile->getY() < $maskingTile->getY()) {
-            $coeffs = [0.5, 0.5, -0.5, -0.5];
+        if ($currentTile->getX() < $maskingTile->getX() && $currentTile->getY() > $maskingTile->getY()) {
+            $coeffs = [1, 1, 0, 0];
         }
         // C * 
         // * M
-        if ($currentTile->getX() < $maskingTile->getX() && $currentTile->getY() > $maskingTile->getY()) {
-            $coeffs = [-0.5, 0.5, 0.5, -0.5];
+        if ($currentTile->getX() < $maskingTile->getX() && $currentTile->getY() < $maskingTile->getY()) {
+            $coeffs = [0, 1, 1, 0];
+        }
+        // M 
+        // C
+        if ($currentTile->getX() === $maskingTile->getX() && $currentTile->getY() > $maskingTile->getY()) {
+            $coeffs = [1, 1, 0, 1];
+        }
+        // C
+        // M 
+        if ($currentTile->getX() === $maskingTile->getX() && $currentTile->getY() < $maskingTile->getY()) {
+            $coeffs = [0, 0, 1, 0];
+        }
+        // C M 
+        if ($currentTile->getX() < $maskingTile->getX() && $currentTile->getY() === $maskingTile->getY()) {
+            $coeffs = [0, 1, 0, 0];
+        }
+        // M C 
+        if ($currentTile->getX() > $maskingTile->getX() && $currentTile->getY() === $maskingTile->getY()) {
+            $coeffs = [1, 0, 1, 1];
         }
 
         return [
-            $maskingTile->getX() + $coeffs[0],
-            $maskingTile->getY() + $coeffs[1],
-            $maskingTile->getX() + $coeffs[2],
-            $maskingTile->getY() + $coeffs[3],
+            $maskingTile->getX() + $coeffs[0] / 2,
+            $maskingTile->getY() + $coeffs[1] / 2,
+            $maskingTile->getX() + $coeffs[2] / 2,
+            $maskingTile->getY() + $coeffs[3] / 2,
         ];
+    }
+
+    public function isReachable(Tile $tile): bool
+    {
+        return $this->reachableTiles[$tile->getId()]['reachable'];
     }
 }

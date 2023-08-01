@@ -53,6 +53,8 @@ class TileFixtures extends Fixture implements DependentFixtureInterface
     {
         $this->makeRoom('red', 1, 4, 1, 6);
         $this->makeRoom('green', 5, 9, 1, 5);
+        $this->makeRoom('yellow', 1, 4, 7, 11);
+        $this->makeRoom('blue', 6, 9, 6, 9);
 
         for ($y = 0; $y < BoardController::BOARD_ROWS; $y++) {
             for ($x = 0; $x < BoardController::BOARD_COLUMNS; $x++) {
